@@ -10,6 +10,7 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 
 import javax.swing.ToolTipManager;
 
@@ -86,6 +87,16 @@ public class FakeSkillsPanel extends PluginPanel
 
     private static final int BAR_INSET_X = 8;
     private static final int BAR_INSET_Y = 7;
+
+    /*
+     * The original visible green fill was 17 artwork pixels tall.
+     * Double it to 34 pixels while keeping its bottom edge fixed.
+     */
+    private static final int XP_FILL_HEIGHT =
+            (BAR_HEIGHT - (BAR_INSET_Y * 2)) * 2;
+
+    private static final DecimalFormat XP_FORMAT =
+            new DecimalFormat("#,##0.##");
 
     // =====================================================
     // ARTWORK
@@ -469,14 +480,25 @@ public class FakeSkillsPanel extends PluginPanel
                 BAR_X
                         + BAR_INSET_X;
 
-        int y =
-                centerY
-                        + BAR_Y_OFFSET
-                        + BAR_INSET_Y;
-
-        int height =
+        /*
+         * Keep the old green bar's bottom edge exactly where it was,
+         * then extend the fill upward to twice its original height.
+         */
+        int originalHeight =
                 BAR_HEIGHT
                         - (BAR_INSET_Y * 2);
+
+        int oldBottomY =
+                centerY
+                        + BAR_Y_OFFSET
+                        + BAR_INSET_Y
+                        + originalHeight;
+
+        int height = XP_FILL_HEIGHT;
+
+        int y =
+                oldBottomY
+                        - height;
 
         /*
          * Dark green lower layer.
@@ -643,14 +665,130 @@ public class FakeSkillsPanel extends PluginPanel
                 );
 
         if (
-                row >= 0
-                        && row < skillDescriptions.length
+                row < 0
+                        || row >= skillDescriptions.length
         )
         {
-            return skillDescriptions[row];
+            return null;
         }
 
-        return null;
+        if (isMouseOverXpBar(event, row))
+        {
+            return getXpProgressTooltip(row);
+        }
+
+        return skillDescriptions[row];
+    }
+
+    private boolean isMouseOverXpBar(
+            MouseEvent event,
+            int row
+    )
+    {
+        double xScale =
+                ART_WIDTH
+                        / (double) DISPLAY_WIDTH;
+
+        double yScale =
+                ART_HEIGHT
+                        / (double) DISPLAY_HEIGHT;
+
+        int artworkX =
+                (int) Math.round(
+                        event.getX() * xScale
+                );
+
+        int artworkY =
+                (int) Math.round(
+                        event.getY() * yScale
+                );
+
+        int originalHeight =
+                BAR_HEIGHT
+                        - (BAR_INSET_Y * 2);
+
+        int barBottomY =
+                ROW_CENTERS[row]
+                        + BAR_Y_OFFSET
+                        + BAR_INSET_Y
+                        + originalHeight;
+
+        int barTopY =
+                barBottomY
+                        - XP_FILL_HEIGHT;
+
+        return artworkX >= BAR_X
+                && artworkX <= BAR_X + BAR_WIDTH
+                && artworkY >= barTopY
+                && artworkY <= barBottomY;
+    }
+
+    private String getXpProgressTooltip(int row)
+    {
+        int level = getLevelForRow(row);
+        double xp = getXpForRow(row);
+
+        double targetXp;
+
+        if (level >= 120)
+        {
+            targetXp = 200_000_000.0;
+        }
+        else if (level >= 99)
+        {
+            targetXp = 200_000_000.0;
+        }
+        else
+        {
+            targetXp = getXpForLevel(level + 1);
+        }
+
+        return XP_FORMAT.format(xp)
+                + " / "
+                + XP_FORMAT.format(targetXp)
+                + " XP";
+    }
+
+    private int getLevelForRow(int row)
+    {
+        switch (row)
+        {
+            case 0:
+                return bankStandingLevel;
+            case 1:
+                return travelingLevel;
+            case 2:
+                return yappingLevel;
+            case 3:
+                return doublingDownLevel;
+            case 4:
+                return prayingLevel;
+            case 5:
+                return expWasteLevel;
+            default:
+                return 1;
+        }
+    }
+
+    private double getXpForRow(int row)
+    {
+        switch (row)
+        {
+            case 0:
+                return bankStandingXp;
+            case 1:
+                return travelingXp;
+            case 2:
+                return yappingXp;
+            case 3:
+                return doublingDownXp;
+            case 4:
+                return prayingXp;
+            case 5:
+                return expWasteXp;
+            default:
+                return 0.0;
+        }
     }
 
     private int getHoveredRow(int mouseY)

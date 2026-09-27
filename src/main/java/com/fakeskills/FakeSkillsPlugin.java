@@ -1,4 +1,5 @@
-package com.fakeskills;
+
+		package com.fakeskills;
 
 import com.google.inject.Provides;
 
@@ -68,6 +69,9 @@ public class FakeSkillsPlugin extends Plugin
 
 	@Inject
 	private ConfigManager configManager;
+
+	@Inject
+	private FakeSkillsConfig config;
 
 	private FakeSkillsPanel panel;
 	private NavigationButton navButton;
@@ -252,8 +256,20 @@ public class FakeSkillsPlugin extends Plugin
 			return;
 		}
 
+		if (!config.travelingEnabled())
+		{
+			travelingTracker.reset();
+			return;
+		}
+
 		double xpEarned =
 				travelingTracker.update();
+
+		if (config.ironmanMode()
+				&& client.getFollower() != null)
+		{
+			xpEarned /= 2.0;
+		}
 
 		if (xpEarned <= 0.0)
 		{
@@ -266,12 +282,6 @@ public class FakeSkillsPlugin extends Plugin
 
 		saveTravelingXp();
 		updateTravelingDisplay();
-
-		System.out.println(
-				"Traveling +"
-						+ xpEarned
-						+ " XP"
-		);
 	}
 
 	// =====================================================
@@ -282,6 +292,12 @@ public class FakeSkillsPlugin extends Plugin
 	{
 		if (bankStandingTracker == null)
 		{
+			return;
+		}
+
+		if (!config.bankStandingEnabled())
+		{
+			bankStandingTracker.reset();
 			return;
 		}
 
@@ -299,12 +315,6 @@ public class FakeSkillsPlugin extends Plugin
 
 		saveBankStandingXp();
 		updateBankStandingDisplay();
-
-		System.out.println(
-				"Bank Standing +"
-						+ xpEarned
-						+ " XP"
-		);
 	}
 
 	// =====================================================
@@ -315,6 +325,12 @@ public class FakeSkillsPlugin extends Plugin
 	{
 		if (prayingTracker == null)
 		{
+			return;
+		}
+
+		if (!config.prayingEnabled())
+		{
+			prayingTracker.reset();
 			return;
 		}
 
@@ -332,12 +348,6 @@ public class FakeSkillsPlugin extends Plugin
 
 		savePrayingXp();
 		updatePrayingDisplay();
-
-		System.out.println(
-				"Praying +"
-						+ xpEarned
-						+ " XP"
-		);
 	}
 
 	// =====================================================
@@ -348,6 +358,12 @@ public class FakeSkillsPlugin extends Plugin
 	{
 		if (doublingDownTracker == null)
 		{
+			return;
+		}
+
+		if (!config.doublingDownEnabled())
+		{
+			doublingDownTracker.clearTemporaryNpcTracking();
 			return;
 		}
 
@@ -370,11 +386,6 @@ public class FakeSkillsPlugin extends Plugin
 		saveDoublingDownXp();
 		updateDoublingDownDisplay();
 
-		System.out.println(
-				"Doubling Down +"
-						+ xpEarned
-						+ " XP"
-		);
 	}
 
 	// =====================================================
@@ -385,6 +396,12 @@ public class FakeSkillsPlugin extends Plugin
 	{
 		if (expWasteTracker == null)
 		{
+			return;
+		}
+
+		if (!config.expWasteEnabled())
+		{
+			expWasteTracker.reset();
 			return;
 		}
 
@@ -403,11 +420,6 @@ public class FakeSkillsPlugin extends Plugin
 		saveExpWasteXp();
 		updateExpWasteDisplay();
 
-		System.out.println(
-				"Exp Waste +"
-						+ xpEarned
-						+ " XP"
-		);
 	}
 
 	private void notifyExpWasteOfFakeXp()
@@ -428,7 +440,8 @@ public class FakeSkillsPlugin extends Plugin
 			ChatMessage event
 	)
 	{
-		if (yappingTracker == null)
+		if (yappingTracker == null
+				|| !config.yappingEnabled())
 		{
 			return;
 		}
@@ -441,6 +454,11 @@ public class FakeSkillsPlugin extends Plugin
 		if (xpEarned <= 0.0)
 		{
 			return;
+		}
+
+		if (config.ironmanMode())
+		{
+			xpEarned *= 2.0;
 		}
 
 		yapping.addXp(
@@ -456,11 +474,6 @@ public class FakeSkillsPlugin extends Plugin
 		saveYappingXp();
 		updateYappingDisplay();
 
-		System.out.println(
-				"Yapping +"
-						+ xpEarned
-						+ " XP"
-		);
 	}
 
 	// =====================================================
@@ -472,7 +485,8 @@ public class FakeSkillsPlugin extends Plugin
 			MenuOptionClicked event
 	)
 	{
-		if (doublingDownTracker != null)
+		if (doublingDownTracker != null
+				&& config.doublingDownEnabled())
 		{
 			doublingDownTracker
 					.onMenuOptionClicked(
@@ -482,7 +496,8 @@ public class FakeSkillsPlugin extends Plugin
 			saveDoublingDownState();
 		}
 
-		if (expWasteTracker != null)
+		if (expWasteTracker != null
+				&& config.expWasteEnabled())
 		{
 			expWasteTracker
 					.onMenuOptionClicked(
@@ -500,7 +515,8 @@ public class FakeSkillsPlugin extends Plugin
 			InteractingChanged event
 	)
 	{
-		if (doublingDownTracker != null)
+		if (doublingDownTracker != null
+				&& config.doublingDownEnabled())
 		{
 			doublingDownTracker
 					.onInteractingChanged(
@@ -514,7 +530,8 @@ public class FakeSkillsPlugin extends Plugin
 			NpcDespawned event
 	)
 	{
-		if (doublingDownTracker != null)
+		if (doublingDownTracker != null
+				&& config.doublingDownEnabled())
 		{
 			doublingDownTracker
 					.onNpcDespawned(
