@@ -89,8 +89,8 @@ public class FakeSkillsPanel extends PluginPanel
     private static final int BAR_INSET_Y = 7;
 
     /*
-     * The original visible green fill was 17 artwork pixels tall.
-     * Double it to 34 pixels while keeping its bottom edge fixed.
+     * Height of the visible XP fill while keeping
+     * its bottom edge aligned with the artwork.
      */
     private static final int XP_FILL_HEIGHT =
             (BAR_HEIGHT - (BAR_INSET_Y * 2)) * 2;
@@ -481,8 +481,8 @@ public class FakeSkillsPanel extends PluginPanel
                         + BAR_INSET_X;
 
         /*
-         * Keep the old green bar's bottom edge exactly where it was,
-         * then extend the fill upward to twice its original height.
+         * Align the XP fill with the bottom edge
+         * of the artwork's progress-bar area.
          */
         int originalHeight =
                 BAR_HEIGHT

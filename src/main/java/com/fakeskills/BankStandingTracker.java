@@ -32,7 +32,7 @@ public class BankStandingTracker
      * 2. Be within 3 tiles of an approved
      *    banker NPC OR banking object.
      *
-     * 3. Remain there for 4 game ticks.
+     * 3. Remain there for 5 game ticks.
      *
      * Award:
      *

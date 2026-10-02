@@ -43,8 +43,6 @@ public class ExpWasteTracker
     private boolean gameplayActionThisTick = false;
 
     /*
-     * NEW:
-     *
      * If ANY of our other Fake Skills awards XP,
      * FakeSkillsPlugin tells us here.
      *

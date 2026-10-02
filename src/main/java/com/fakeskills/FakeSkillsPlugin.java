@@ -1,5 +1,4 @@
-
-		package com.fakeskills;
+package com.fakeskills;
 
 import com.google.inject.Provides;
 

@@ -192,13 +192,6 @@ public class DoublingDownTracker
         {
             waitingMonsterName =
                     monsterName;
-
-            System.out.println(
-                    "Doubling Down combat: first "
-                            + monsterName
-                            + " kill recorded."
-            );
-
             return;
         }
 
@@ -208,29 +201,13 @@ public class DoublingDownTracker
                 )
         )
         {
-            double reward =
-                    awardCompletedPair();
-
-            System.out.println(
-                    "Doubling Down combat: "
-                            + monsterName
-                            + " pair completed! +"
-                            + reward
-                            + " XP"
-            );
-
+            awardCompletedPair();
             waitingMonsterName = null;
             return;
         }
 
         waitingMonsterName =
                 monsterName;
-
-        System.out.println(
-                "Doubling Down combat: now waiting for another "
-                        + monsterName
-                        + "."
-        );
     }
 
     // =====================================================
@@ -306,9 +283,7 @@ public class DoublingDownTracker
                 );
 
         registerAction(
-                actionKey,
-                option,
-                target
+                actionKey
         );
     }
 
@@ -336,9 +311,7 @@ public class DoublingDownTracker
     }
 
     private void registerAction(
-            String actionKey,
-            String option,
-            String target
+            String actionKey
     )
     {
         /*
@@ -351,19 +324,7 @@ public class DoublingDownTracker
                 )
         )
         {
-            double reward =
-                    awardCompletedPair();
-
-            System.out.println(
-                    "Doubling Down action: "
-                            + option
-                            + " -> "
-                            + target
-                            + " pair completed! +"
-                            + reward
-                            + " XP"
-            );
-
+            awardCompletedPair();
             return;
         }
 
@@ -375,14 +336,6 @@ public class DoublingDownTracker
          */
         waitingActions.add(
                 actionKey
-        );
-
-        System.out.println(
-                "Doubling Down action: "
-                        + option
-                        + " -> "
-                        + target
-                        + " armed at 1/2."
         );
     }
 
@@ -453,7 +406,7 @@ public class DoublingDownTracker
     // SHARED REWARD SEQUENCE
     // =====================================================
 
-    private double awardCompletedPair()
+    private void awardCompletedPair()
     {
         double reward;
 
@@ -472,8 +425,6 @@ public class DoublingDownTracker
 
         doubleRewardNext =
                 !doubleRewardNext;
-
-        return reward;
     }
 
     private double collectPendingXp()
